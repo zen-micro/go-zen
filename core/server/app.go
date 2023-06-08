@@ -12,26 +12,26 @@ import (
 	"time"
 )
 
-type BaseInterface interface {
+type AppInterface interface {
 	rpcServer()
 	httpServer()
 	run() error
 }
 
-type Base struct {
+type AppEngine struct {
 	gs     *grpc.Server
 	hs     *http.Server
 	gsAddr string
 }
 
-func New(gs *grpc.Server, hs *http.Server) *Base {
-	return &Base{
+func New(gs *grpc.Server, hs *http.Server) *AppEngine {
+	return &AppEngine{
 		gs: gs,
 		hs: hs,
 	}
 }
 
-func (b *Base) rpcServer() {
+func (b *AppEngine) rpcServer() {
 	reflection.Register(b.gs)
 	l, err := net.Listen("tcp", ":8081")
 	if err != nil {
@@ -43,13 +43,13 @@ func (b *Base) rpcServer() {
 	}
 }
 
-func (b *Base) httpServer() {
+func (b *AppEngine) httpServer() {
 	if err := b.hs.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("listen: %s\n", err)
 	}
 }
 
-func (b *Base) Run() error {
+func (b *AppEngine) Run() error {
 	//开启
 	go b.httpServer()
 
